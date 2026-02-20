@@ -24,6 +24,14 @@ class AppLocalization  extends Translations{
       "find_and_click":"Find and Click ",
       "allow_access_statuses":"Allow access to view , download & save statuses",
       "allow_access":"Allow access",
+      "whatsapp":"WhatsApp",
+      "instagram":"Instagram",
+      "snapchat":"SnapChat",
+      "status":"Status",
+      "repost":"Repost",
+      "share":"Share",
+      "save":"Save",
+      "download":"Download",
 
     },
     'hi_IN':{

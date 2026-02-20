@@ -5,6 +5,8 @@ import 'package:statusly/features/home/presentation/bindings/home_bonding.dart';
 import 'package:statusly/features/home/presentation/view/home_screen.dart';
 import 'package:statusly/features/splash/presentation/bindings/splash_binding.dart';
 import 'package:statusly/features/splash/presentation/view/splash_screen.dart';
+import 'package:statusly/features/whatsapp/presentation/bindings/whatsapp_bindings.dart';
+import 'package:statusly/features/whatsapp/presentation/view/whatsapp_screen.dart';
 
 class AppPages{
 
@@ -18,6 +20,11 @@ class AppPages{
        name: AppRoutes.home,
        page: ()=> HomeScreen(),
        binding: HomeBinding(),
+    ),
+    GetPage(
+       name: AppRoutes.whatsapp,
+       page: ()=> WhatsappScreen(),
+       binding: WhatsAppBindings(),
     ),
   ];
 

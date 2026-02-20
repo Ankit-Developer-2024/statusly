@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:statusly/core/component/widgets/universal_media_view.dart';
 import 'package:statusly/core/styles/app_colors.dart';
 import 'package:statusly/core/styles/app_dimensions.dart';
 import 'package:statusly/core/styles/app_text_styles.dart';
 import 'package:statusly/core/utility/utils.dart';
 import 'package:statusly/features/home/presentation/controller/home_controller.dart';
-import 'package:statusly/features/home/presentation/view/status_video_item.dart';
 import 'package:statusly/features/home/presentation/view/widgets/allow_access_permission_widget.dart';
-import 'package:video_player/video_player.dart';
+import 'package:statusly/features/home/presentation/view/widgets/available_status_app_ui_widget.dart';
 
 class HomeScreen extends GetView<HomeController> {
   const HomeScreen({super.key});
@@ -33,7 +31,7 @@ class HomeScreen extends GetView<HomeController> {
       ),
       body: Obx((){
            return controller.isPermission.value
-               ? Text("yes")
+               ? AvailableStatusAppUiWidget()
                : AllowAccessPermissionWidget();
          })
 

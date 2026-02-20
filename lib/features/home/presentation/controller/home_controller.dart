@@ -12,8 +12,6 @@ class HomeController extends GetxController{
 
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
-  RxList<Uint8List> images=<Uint8List>[].obs;
-  RxList<String> videos=<String>[].obs;
   RxBool isPermission=false.obs;
 
   @override
@@ -30,31 +28,6 @@ class HomeController extends GetxController{
       isPermission.value=true;
     }
   }
-
-
-  void loadStatuses() async {
-    String? savedUri= AppPreferences.instance.getValue(StorageKeys.whatsAppUri);
-    if(savedUri==null || savedUri.isEmpty){
-      isPermission.value=false;
-      Get.dialog(GrantPermissionUriPath()).then((val){
-        String? savedUri= AppPreferences.instance.getValue(StorageKeys.whatsAppUri);
-        if(savedUri!=null && savedUri.isNotEmpty)  isPermission.value=true;
-      });
-    }
-
-     final files = await StatusSafService.readStatuses(savedUri!);
-
-      for(int i=0;i<files.length;i++){
-        if(files[i].endsWith(".jpg")){
-          Uint8List? data=  await StatusSafService.getImageBytes(files[i]);
-          if(data!=null){
-            images.add(data);
-          }
-        }else if(files[i].endsWith(".mp4")){
-          videos.add(files[i]);
-        }
-      }
-    }
 
   }
 
