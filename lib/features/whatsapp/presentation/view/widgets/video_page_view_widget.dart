@@ -14,69 +14,73 @@ class VideoPageViewWidget extends GetView<WhatsAppController> {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-        itemCount: controller.videos.length,
-        padding: EdgeInsets.only( top:AppDimensions.spacing_15,left: AppDimensions.spacing_15,right: AppDimensions.spacing_15, bottom: AppDimensions.spacing_40),
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            mainAxisSpacing: AppDimensions.spacing_10,
-            crossAxisSpacing: AppDimensions.spacing_10,
-            mainAxisExtent: 200
-        ),
-        itemBuilder: (context,index){
-          return Container(
-            decoration: BoxDecoration(
-                color:AppColors.white,
-                borderRadius: BorderRadius.circular(AppDimensions.radius_8),
-                boxShadow: [
-                  BoxShadow(color: AppColors.grey400,spreadRadius: 1,blurRadius: 1.5,offset: Offset(0, 1))
-                ]
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              spacing: AppDimensions.spacing_3,
-              children: [
-                InkWell(
-                  onTap: (){
-                    Get.to(VideoViewWidget(videoUri: controller.videos[index]));
-                  },
-                  child: Container(
-                    height:150,
-                    width: double.maxFinite,
-                    decoration:  BoxDecoration(
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.all(AppDimensions.spacing_15),
+          sliver: SliverGrid.builder(
+              itemCount: controller.videos.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: AppDimensions.spacing_10,
+                  crossAxisSpacing: AppDimensions.spacing_10,
+                  mainAxisExtent: 200
+              ),
+              itemBuilder: (context,index){
+                return Container(
+                  decoration: BoxDecoration(
+                      color:AppColors.white,
                       borderRadius: BorderRadius.circular(AppDimensions.radius_8),
-                    ),
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(AppDimensions.radius_8),
-                        child: StatusVideoItem(uri: controller.videos[index],isShowButton: false,)
-                    ),
+                      boxShadow: [
+                        BoxShadow(color: AppColors.grey400,spreadRadius: 1,blurRadius: 1.5,offset: Offset(0, 1))
+                      ]
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal:  3.0),
-                  child: Row(
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    spacing: AppDimensions.spacing_4,
+                    spacing: AppDimensions.spacing_3,
                     children: [
-                      Expanded(
-                          child: PrimaryButton(
-                            onPress: (){},
-                            leftIcon: UniversalMediaView(path:getLocalPng("save_logo"),imageHeight: 17,),
-                            backgroundColor: AppColors.primaryGreen.withAlpha(200),
-                          )),
-                      Expanded(
-                          child: PrimaryButton(
-                            leftIcon: Icon(Icons.save_alt_rounded,size: 17,color: AppColors.white,),
-                          )),
+                      InkWell(
+                        onTap: (){
+                          Get.to(VideoViewWidget(videoUri: controller.videos[index]));
+                        },
+                        child: Container(
+                          height:150,
+                          width: double.maxFinite,
+                          decoration:  BoxDecoration(
+                            borderRadius: BorderRadius.circular(AppDimensions.radius_8),
+                          ),
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(AppDimensions.radius_8),
+                              child: StatusVideoItem(uri: controller.videos[index],isShowButton: false,)
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal:  3.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: AppDimensions.spacing_4,
+                          children: [
+                            Expanded(
+                                child: PrimaryButton(
+                                  onPress: (){},
+                                  leftIcon: UniversalMediaView(path:getLocalPng("save_logo"),imageHeight: 17,),
+                                  backgroundColor: AppColors.primaryGreen.withAlpha(200),
+                                )),
+                            Expanded(
+                                child: PrimaryButton(
+                                  leftIcon: Icon(Icons.save_alt_rounded,size: 17,color: AppColors.white,),
+                                )),
+                          ],
+                        ),
+                      )
                     ],
                   ),
-                )
-              ],
-            ),
-          );
-        }
+                );
+              }
+          ),
+        )
+      ],
     );
   }
 }
