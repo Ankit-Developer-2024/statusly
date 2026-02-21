@@ -1,11 +1,14 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:statusly/core/utility/constants/storage_keys.dart';
 import 'package:statusly/core/utility/services/status_saf_services.dart';
+import 'package:statusly/core/utility/utils.dart';
 import 'package:statusly/core/wrapper/preferences/app_preferences.dart';
 import 'package:statusly/features/home/presentation/view/widgets/dialog_box/grant_permission_uri_path.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class WhatsAppController extends GetxController{
 
@@ -15,7 +18,10 @@ class WhatsAppController extends GetxController{
 
   RxList<Uint8List> images=<Uint8List>[].obs;
   RxList<String> videos=<String>[].obs;
+  RxList<String> savedVideos=<String>[].obs;
   RxBool isPermission=true.obs;
+  Map<String, Uint8List?> videoThumbnailCache = {};
+  Map<String, Uint8List?> savedVideoThumbnailCache = {};
 
   @override
   void onInit() {
@@ -41,7 +47,6 @@ class WhatsAppController extends GetxController{
         Uint8List? data=  await StatusSafService.getImageBytes(files[i]);
         if(data!=null){
           images.add(data);
-          images.add(data);
         }
       }else if(files[i].endsWith(".mp4")){
         videos.add(files[i]);
@@ -49,5 +54,84 @@ class WhatsAppController extends GetxController{
     }
   }
 
+  Future<Uint8List?> generateVideoThumbnail(String videoContentUri) async {
+   try{
+
+     if (videoThumbnailCache.containsKey(videoContentUri)) {
+       return videoThumbnailCache[videoContentUri];
+     }
+
+     final String path = await StatusSafService.copyUriToFile(videoContentUri,type: "thumbnail");
+
+     final thumbnail = await VideoThumbnail.thumbnailData(
+       video: path,
+       imageFormat: ImageFormat.JPEG,
+       quality: 75,
+     );
+
+     videoThumbnailCache[videoContentUri] = thumbnail;
+     return thumbnail;
+   }catch(e){
+     appLog(e);
+     return null;
+   }
+  }
+
+  Future<Uint8List?> generateSavedVideoThumbnail(String videoContentPath) async {
+   try{
+
+     if (savedVideoThumbnailCache.containsKey(videoContentPath)) {
+       return savedVideoThumbnailCache[videoContentPath];
+     }
+
+     final thumbnail = await VideoThumbnail.thumbnailData(
+       video: videoContentPath,
+       imageFormat: ImageFormat.JPEG,
+       quality: 75,
+     );
+
+     savedVideoThumbnailCache[videoContentPath] = thumbnail;
+     return thumbnail;
+   }catch(e){
+     appLog(e);
+     return null;
+   }
+  }
+
+  void getSavedVideo()  async{
+    List<String>? savedVideoPath=await AppPreferences.instance.getValue(StorageKeys.whatsAppSaved);
+    if(savedVideoPath==null || savedVideoPath.isEmpty){
+      savedVideos.clear();
+    }else{
+      savedVideos.clear();
+      savedVideos.addAll(List.from(savedVideoPath));
+    }
+  }
+
+  Future<void> deleteSavedVideo(String path,int index) async {
+    final file = File(path);
+
+    if (await file.exists()) {
+      await file.delete();
+      savedVideos.removeAt(index);
+      if(savedVideos.isEmpty){
+        AppPreferences.instance.delete(StorageKeys.whatsAppSaved);
+      }else{
+        AppPreferences.instance.putValue(StorageKeys.whatsAppSaved, List<String>.from(savedVideos).toList());
+      }
+      showToast("Deleted successfully");
+    } else {
+      showToast("Video not found");
+    }
+  }
+
+  Future<void> downloadVideoToGallery(String path)async{
+    bool isSaved= await StatusSafService.saveUriVideo(path);
+    if(isSaved){
+      showToast("Video download successfully");
+    }else{
+      showToast("Unable to download video");
+    }
+  }
 
 }

@@ -26,4 +26,17 @@ class StoragePermissionHelper{
 
   }
 
+  static Future<bool> requestPermission() async {
+    if (await Permission.photos.isGranted ||
+        await Permission.storage.isGranted) {
+      return true;
+    }
+
+    var result = await Permission.photos.request();
+    if (result.isGranted) return true;
+
+    result = await Permission.storage.request();
+    return result.isGranted;
+  }
+
 }

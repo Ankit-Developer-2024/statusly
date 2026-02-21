@@ -20,6 +20,10 @@ class AppPreferences{
     return box.putAt(index, value);
   }
 
+  Future delete(String key) {
+    return box.delete(key);
+  }
+
   dynamic getValue(String key, {dynamic defaultValue}) {
     return box.get(key, defaultValue: defaultValue);
   }

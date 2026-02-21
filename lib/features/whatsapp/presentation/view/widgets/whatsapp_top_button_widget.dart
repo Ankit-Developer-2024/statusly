@@ -9,6 +9,8 @@ import 'package:statusly/features/whatsapp/presentation/controller/whatsapp_cont
 class WhatsappTopButtonWidget extends GetView<WhatsAppController> {
   const WhatsappTopButtonWidget({super.key});
 
+
+
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
@@ -84,10 +86,11 @@ class WhatsappTopButtonWidget extends GetView<WhatsAppController> {
       ),
       automaticallyImplyLeading: false,
       toolbarHeight: 70,
-      systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-      ),
+      // systemOverlayStyle: SystemUiOverlayStyle(
+      //   statusBarIconBrightness: Brightness.dark,
+      //   statusBarBrightness: Brightness.dark,
+      //   statusBarColor: AppColors.white,
+      // ),
 
     );
   }

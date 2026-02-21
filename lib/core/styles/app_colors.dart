@@ -5,6 +5,8 @@ class AppColors{
   static const Color subTextColor = Color(0xff6D7175);
   static const Color white= Colors.white;
 
+  static const Color redAccent= Colors.redAccent;
+
   static const Color whatsAppGreen= Color(0xff128C7E);
   static const Color whatsAppGreen2= Color(0xff005d4b);
   static const Color instaGramOrange= Color(0xfff9ce34);

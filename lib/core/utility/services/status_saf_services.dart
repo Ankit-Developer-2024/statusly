@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:statusly/core/utility/constants/storage_keys.dart';
 import 'package:statusly/core/wrapper/preferences/app_preferences.dart';
@@ -26,4 +28,28 @@ class StatusSafService {
     );
     return bytes;
   }
+
+  static Future<String> copyUriToFile(String uri, {required String type}) async {
+    final String path = await _channel.invokeMethod(
+      'copyContentUriToFile',
+      {
+        'uri': uri,
+        "type":type,
+      },
+
+    );
+    return path;
+  }
+
+  static Future<bool> saveUriVideo(String uri) async {
+    final bool isSaved = await _channel.invokeMethod(
+      'saveUriVideo',
+      {
+        'uri': uri,
+      },
+
+    );
+    return isSaved;
+  }
+
 }

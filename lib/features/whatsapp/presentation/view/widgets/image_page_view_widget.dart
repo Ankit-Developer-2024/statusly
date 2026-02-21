@@ -77,7 +77,9 @@ class ImagePageViewWidget extends GetView<WhatsAppController> {
                           children: [
                             Expanded(
                               child: PrimaryButton(
-                                onPress: () {},
+                                onPress: () {
+                                  saveImageInsideApp(controller.images[index]);
+                                },
                                 leftIcon: UniversalMediaView(
                                   path: getLocalPng("save_logo"),
                                   imageHeight: 17,
@@ -89,6 +91,9 @@ class ImagePageViewWidget extends GetView<WhatsAppController> {
                             ),
                             Expanded(
                               child: PrimaryButton(
+                                onPress:(){
+                                  downloadImageToGallery(controller.images[index]);
+                                },
                                 leftIcon: Icon(
                                   Icons.save_alt_rounded,
                                   size: 17,

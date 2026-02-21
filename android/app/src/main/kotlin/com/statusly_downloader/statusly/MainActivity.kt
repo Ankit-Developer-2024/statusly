@@ -4,12 +4,19 @@ package com.statusly_downloader.statusly
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Environment
 import android.os.Bundle
 import androidx.documentfile.provider.DocumentFile
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import android.content.ContentValues
+import android.provider.MediaStore
+import java.io.InputStream
+import java.io.OutputStream
 
 class MainActivity: FlutterActivity() {
 
@@ -65,6 +72,50 @@ class MainActivity: FlutterActivity() {
                     }
                 }
 
+                else if (call.method == "copyContentUriToFile") {
+                    val uriString = call.argument<String>("uri")
+                    val type = call.argument<String>("type")
+
+                    if (uriString == null || type == null) {
+                        result.error("INVALID", "Missing arguments", null)
+                        return@setMethodCallHandler
+                    }
+
+                    val uri = Uri.parse(uriString)
+
+                    val inputStream = contentResolver.openInputStream(uri)
+
+                    if (inputStream == null) {
+                        result.error("ERROR", "Cannot open input stream", null)
+                        return@setMethodCallHandler
+                    }
+
+                    val fileName = "video_${uri.hashCode()}.mp4"
+                    val file: File
+
+                    if(type=="save"){
+                        file = File(filesDir, fileName)
+                    }else{
+                        file = File(cacheDir, fileName)
+                    }
+
+                    val outputStream = FileOutputStream(file)
+
+                    inputStream?.copyTo(outputStream)
+
+                    inputStream?.close()
+                    outputStream.close()
+
+                    result.success(file.absolutePath)
+
+                }
+
+                else if(call.method=="saveUriVideo"){
+                    val uriString = call.argument<String>("uri")
+                    val isSaved = saveUriVideo(Uri.parse(uriString))
+                    result.success(isSaved)
+                }
+
                 else {
                     result.notImplemented()
                 }
@@ -106,5 +157,47 @@ class MainActivity: FlutterActivity() {
 
         return result
     }
+
+    fun saveUriVideo(contentUri: Uri): Boolean {
+        return try {
+
+            val resolver = applicationContext.contentResolver
+            val inputStream = resolver.openInputStream(contentUri) ?: return false
+
+            val fileName = "VID_${System.currentTimeMillis()}.mp4"
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Video.Media.DISPLAY_NAME, fileName)
+                put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
+                put(
+                    MediaStore.Video.Media.RELATIVE_PATH,
+                    Environment.DIRECTORY_PICTURES  + "/Statusly"
+                )
+                put(MediaStore.Video.Media.IS_PENDING, 1)
+            }
+
+            val videoUri = resolver.insert(
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+            ) ?: return false
+
+            val outputStream = resolver.openOutputStream(videoUri) ?: return false
+
+            inputStream.copyTo(outputStream)
+
+            outputStream.close()
+            inputStream.close()
+
+            contentValues.clear()
+            contentValues.put(MediaStore.Video.Media.IS_PENDING, 0)
+            resolver.update(videoUri, contentValues, null, null)
+
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+
 
 }
