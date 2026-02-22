@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:statusly/core/utility/constants/storage_keys.dart';
 import 'package:statusly/core/wrapper/preferences/app_preferences.dart';
 
-class StatusSafService {
+class StatusSafMethodChannel {
   static const _channel = MethodChannel('status_saf_channel');
 
   static Future<void> openFolderPicker() async {

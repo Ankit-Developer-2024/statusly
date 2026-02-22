@@ -8,9 +8,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:statusly/core/styles/app_colors.dart';
 import 'package:statusly/core/utility/constants/storage_keys.dart';
-import 'package:statusly/core/utility/helper/storage_permission_helper.dart';
-import 'package:statusly/core/utility/services/status_saf_services.dart';
+import 'package:statusly/core/utility/helper/device_info_helper.dart';
+import 'package:statusly/core/method_channels/status_saf_method_channel.dart';
 import 'package:statusly/core/wrapper/preferences/app_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 String getLocalImage(String name) {
   return 'assets/image/$name.png';
@@ -45,21 +46,32 @@ String getString(String key){
 }
 
 Future<void> saveVideoInsideApp(String videoUri) async {
-   final String path = await StatusSafService.copyUriToFile(videoUri, type: "save");
+   String path;
+   if(isAndroid()){
+     if(await DeviceInfoHelper.androidDeviceVersion()>=11){
+       path = await StatusSafMethodChannel.copyUriToFile(videoUri,type: "save");
+     }else{
+       // for version <=10
+       path = await StatusSafMethodChannel.copyUriToFile(videoUri,type: "save");
+     }
+   }else{
+     //IOS
+     path = await StatusSafMethodChannel.copyUriToFile(videoUri,type: "save");
+   }
 
    List<String>? data= AppPreferences.instance.getValue(StorageKeys.whatsAppSaved);
 
    if(data==null){
      AppPreferences.instance.putValue(StorageKeys.whatsAppSaved,[path]);
-     showToast("Video save successfully");
+     showToast(getString("video_save_successfully"));
    }else{
      if(data.contains(path)) {
-       showToast("This video is already saved");
+       showToast(getString("video_already_saved"));
        return;
      }
      data.add(path);
      AppPreferences.instance.putValue(StorageKeys.whatsAppSaved,data);
-     showToast("Video save successfully");
+     showToast(getString("video_save_successfully"));
    }
 }
 
@@ -76,39 +88,38 @@ Future<void> saveImageInsideApp(Uint8List bytes) async {
 
   if(data==null){
     AppPreferences.instance.putValue(StorageKeys.whatsAppSaved,[path]);
-    showToast("Image save successfully");
+    showToast(getString("image_save_successfully"));
   }else{
     if(data.contains(path)) {
-      showToast("This Image is already saved");
+      showToast(getString("image_already_saved"));
       return;
     }
     data.add(path);
     AppPreferences.instance.putValue(StorageKeys.whatsAppSaved,data);
-    showToast("Image save successfully");
+    showToast(getString("image_save_successfully"));
   }
 }
 
 Future<void> downloadFileToGallery(String filePath) async {
-  final hasPermission = await StoragePermissionHelper.requestPermission();
-  if (!hasPermission) return;
 
   final isVideo = filePath.toLowerCase().endsWith(".mp4");
 
   if (isVideo) {
     await Gal.putVideo(filePath, album: "Statusly",);
-    showToast("Video download successfully");
+    showToast(getString("video_download_successfully"));
   } else {
     await Gal.putImage(filePath, album: "Statusly",);
-    showToast("Image download successfully");
+    showToast(getString("image_download_successfully"));
   }
 }
 
 Future<void> downloadImageToGallery(Uint8List bytes) async {
-  final hasPermission = await StoragePermissionHelper.requestPermission();
-  if (!hasPermission) return;
-
-  await Gal.putImageBytes(bytes, album: "Statusly",name: "IMG_${DateTime.now().millisecondsSinceEpoch.toString()}");
-  showToast("Image download successfully");
+  try{
+    await Gal.putImageBytes(bytes, album: "Statusly",name: "IMG_${DateTime.now().millisecondsSinceEpoch.toString()}");
+    showToast(getString("image_download_successfully"));
+  }catch(e){
+    appLog(e);
+  }
 
 }
 
@@ -131,12 +142,28 @@ void showToast(String title){
 
 }
 
-void shareWhatsApp(){
+void shareApp(){
   SharePlus.instance.share(
       ShareParams(text: 'check out my website https://example.com')
   );
 }
 
+bool isAndroid(){
+  return Platform.isAndroid;
+}
+
+bool isIOS(){
+  return Platform.isIOS;
+}
+
+Future<void> launchWhatsApp() async {
+  const url = 'whatsapp://status'; // Example URL scheme for WhatsApp
+  if (await canLaunchUrl(Uri.parse(url))) {
+    await launchUrl(Uri.parse(url));
+  } else {
+    showToast(getString("whatsapp_not_installed"));
+  }
+}
 
 
 

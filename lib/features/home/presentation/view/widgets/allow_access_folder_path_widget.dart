@@ -5,14 +5,11 @@ import 'package:statusly/core/component/widgets/universal_media_view.dart';
 import 'package:statusly/core/styles/app_colors.dart';
 import 'package:statusly/core/styles/app_dimensions.dart';
 import 'package:statusly/core/styles/app_text_styles.dart';
-import 'package:statusly/core/utility/constants/storage_keys.dart';
-import 'package:statusly/core/utility/services/status_saf_services.dart';
 import 'package:statusly/core/utility/utils.dart';
-import 'package:statusly/core/wrapper/preferences/app_preferences.dart';
 import 'package:statusly/features/home/presentation/controller/home_controller.dart';
 
-class AllowAccessPermissionWidget extends GetView<HomeController> {
-  const AllowAccessPermissionWidget({super.key});
+class AllowAccessFolderPathWidget extends GetView<HomeController> {
+  const AllowAccessFolderPathWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +26,7 @@ class AllowAccessPermissionWidget extends GetView<HomeController> {
             SizedBox(height: AppDimensions.spacing_10,),
             PrimaryButton(
               onPress: ()async{
-                await StatusSafService.openFolderPicker().then((val){
-                  String? savedUri= AppPreferences.instance.getValue(StorageKeys.whatsAppUri);
-                  if(savedUri!=null && savedUri.isNotEmpty) controller.isPermission.value=true;
-                });
+                controller.allowFolderAccess();
               },
               title: getString("allow_access"),
               titleStyle: AppTextStyles.medium16P(color: AppColors.white),

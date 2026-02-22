@@ -1,16 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:statusly/core/component/widgets/primary_button.dart';
 import 'package:statusly/core/styles/app_colors.dart';
 import 'package:statusly/core/styles/app_dimensions.dart';
 import 'package:statusly/core/styles/app_text_styles.dart';
-import 'package:statusly/core/utility/services/status_saf_services.dart';
 import 'package:statusly/core/utility/utils.dart';
 import 'package:statusly/features/home/presentation/controller/home_controller.dart';
 
-class GrantPermissionUriPath extends GetView<HomeController> {
-  const GrantPermissionUriPath({super.key});
+class AllowAccessFolderPathDialogBox extends GetView<HomeController> {
+  const AllowAccessFolderPathDialogBox({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +62,7 @@ class GrantPermissionUriPath extends GetView<HomeController> {
             ],
           ),
           SizedBox(height: AppDimensions.spacing_15,),
-          Text(getString("To save & download statuses , storage permission is required"),style: AppTextStyles.medium14P(),textAlign: TextAlign.center,),
+          Text(getString("folder_path_permission"),style: AppTextStyles.medium14P(),textAlign: TextAlign.center,),
           SizedBox(height: AppDimensions.spacing_15,),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -99,10 +97,10 @@ class GrantPermissionUriPath extends GetView<HomeController> {
       ),
       actions: [
         PrimaryButton(
-          onPress: () async{
-            await StatusSafService.openFolderPicker();
+          onPress: (){
+            controller.allowFolderAccess();
           },
-          title: getString("grant_permission"),
+          title: getString("allow_access"),
           titleStyle: AppTextStyles.medium16P(color: AppColors.white),
         )
       ],

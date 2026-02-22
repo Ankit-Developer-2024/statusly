@@ -3,11 +3,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:statusly/core/method_channels/status_saf_method_channel.dart';
 import 'package:statusly/core/utility/constants/storage_keys.dart';
-import 'package:statusly/core/utility/services/status_saf_services.dart';
+import 'package:statusly/core/utility/helper/device_info_helper.dart';
 import 'package:statusly/core/utility/utils.dart';
 import 'package:statusly/core/wrapper/preferences/app_preferences.dart';
-import 'package:statusly/features/home/presentation/view/widgets/dialog_box/grant_permission_uri_path.dart';
+import 'package:statusly/features/home/presentation/view/widgets/dialog_box/allow_access_folder_path_dialog_box.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class WhatsAppController extends GetxController{
@@ -24,27 +25,42 @@ class WhatsAppController extends GetxController{
   Map<String, Uint8List?> savedVideoThumbnailCache = {};
 
   @override
-  void onInit() {
+  void onInit(){
     super.onInit();
     loadStatuses();
   }
 
-  void loadStatuses() async {
+  void loadStatuses()async{
+    if(isAndroid()){
+      if(await DeviceInfoHelper.androidDeviceVersion()>=11){
+        loadAndroidStatuses();
+      }else{
+        // For version <=10
+        loadAndroidStatuses();
+      }
+
+    }else{
+      // For IOS
+    }
+  }
+
+  void loadAndroidStatuses() async {
+    //verified that is suitable for android version 11+
     String? savedUri= AppPreferences.instance.getValue(StorageKeys.whatsAppUri);
     if(savedUri==null || savedUri.isEmpty){
       isPermission.value=false;
-      Get.dialog(GrantPermissionUriPath()).then((val){
+      Get.dialog(AllowAccessFolderPathDialogBox()).then((val){
         String? savedUri= AppPreferences.instance.getValue(StorageKeys.whatsAppUri);
         if(savedUri!=null && savedUri.isNotEmpty)  isPermission.value=true;
         return;
       });
     }
 
-    final files = await StatusSafService.readStatuses(savedUri!);
+    final files = await StatusSafMethodChannel.readStatuses(savedUri!);
 
     for(int i=0;i<files.length;i++){
       if(files[i].endsWith(".jpg")){
-        Uint8List? data=  await StatusSafService.getImageBytes(files[i]);
+        Uint8List? data=  await StatusSafMethodChannel.getImageBytes(files[i]);
         if(data!=null){
           images.add(data);
         }
@@ -60,8 +76,18 @@ class WhatsAppController extends GetxController{
      if (videoThumbnailCache.containsKey(videoContentUri)) {
        return videoThumbnailCache[videoContentUri];
      }
-
-     final String path = await StatusSafService.copyUriToFile(videoContentUri,type: "thumbnail");
+     String path;
+     if(isAndroid()){
+       if(await DeviceInfoHelper.androidDeviceVersion()>=11){
+         path = await StatusSafMethodChannel.copyUriToFile(videoContentUri,type: "thumbnail");
+       }else{
+         // for version <=10
+         path = await StatusSafMethodChannel.copyUriToFile(videoContentUri,type: "thumbnail");
+       }
+     }else{
+       //IOS
+       path = await StatusSafMethodChannel.copyUriToFile(videoContentUri,type: "thumbnail");
+     }
 
      final thumbnail = await VideoThumbnail.thumbnailData(
        video: path,
@@ -98,7 +124,7 @@ class WhatsAppController extends GetxController{
    }
   }
 
-  void getSavedVideo()  async{
+  void getSavedVideo()async{
     List<String>? savedVideoPath=await AppPreferences.instance.getValue(StorageKeys.whatsAppSaved);
     if(savedVideoPath==null || savedVideoPath.isEmpty){
       savedVideos.clear();
@@ -126,7 +152,19 @@ class WhatsAppController extends GetxController{
   }
 
   Future<void> downloadVideoToGallery(String path)async{
-    bool isSaved= await StatusSafService.saveUriVideo(path);
+    bool isSaved;
+    if(isAndroid()){
+      if(await DeviceInfoHelper.androidDeviceVersion()>=11){
+        isSaved= await StatusSafMethodChannel.saveUriVideo(path);
+      }else{
+        //version <=10
+        isSaved= await StatusSafMethodChannel.saveUriVideo(path);
+      }
+    }else{
+      //IOS
+      isSaved= await StatusSafMethodChannel.saveUriVideo(path);
+    }
+
     if(isSaved){
       showToast("Video download successfully");
     }else{

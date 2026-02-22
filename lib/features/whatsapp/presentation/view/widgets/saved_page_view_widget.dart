@@ -11,6 +11,7 @@ import 'package:statusly/core/styles/app_colors.dart';
 import 'package:statusly/core/styles/app_dimensions.dart';
 import 'package:statusly/core/utility/utils.dart';
 import 'package:statusly/features/whatsapp/presentation/view/widgets/image_view_widget.dart';
+import 'package:statusly/features/whatsapp/presentation/view/widgets/saved_status_empty_widget.dart';
 
 class SavedPageViewWidget extends GetView<WhatsAppController> {
   const SavedPageViewWidget({super.key});
@@ -18,8 +19,11 @@ class SavedPageViewWidget extends GetView<WhatsAppController> {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
-      slivers: [ Obx((){
-        return SliverPadding(
+      slivers: [
+        Obx((){
+        return controller.savedVideos.isEmpty
+          ? SavedStatusEmptyWidget()
+          : SliverPadding(
           padding: EdgeInsets.all(AppDimensions.spacing_15),
           sliver: SliverGrid.builder(
               itemCount: controller.savedVideos.length,

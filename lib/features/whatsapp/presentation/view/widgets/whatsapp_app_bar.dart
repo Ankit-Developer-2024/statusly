@@ -4,6 +4,7 @@ import 'package:statusly/core/component/widgets/universal_media_view.dart';
 import 'package:statusly/core/styles/app_colors.dart';
 import 'package:statusly/core/styles/app_dimensions.dart';
 import 'package:statusly/core/styles/app_text_styles.dart';
+import 'package:statusly/core/utility/helper/device_info_helper.dart';
 import 'package:statusly/core/utility/utils.dart';
 
 class WhatsappAppBar extends StatelessWidget {
@@ -14,7 +15,7 @@ class WhatsappAppBar extends StatelessWidget {
     return SliverToBoxAdapter(
       child: InkWell(
         onTap: (){
-          shareWhatsApp();
+          DeviceInfoHelper.androidDeviceVersion();
         },
         child: Container(
           width: double.maxFinite,

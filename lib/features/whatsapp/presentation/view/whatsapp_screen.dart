@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:statusly/core/styles/app_colors.dart';
-import 'package:statusly/core/styles/app_dimensions.dart';
-import 'package:statusly/core/utility/utils.dart';
 import 'package:statusly/features/whatsapp/presentation/controller/whatsapp_controller.dart';
 import 'package:statusly/features/whatsapp/presentation/view/widgets/image_page_view_widget.dart';
 import 'package:statusly/features/whatsapp/presentation/view/widgets/saved_page_view_widget.dart';

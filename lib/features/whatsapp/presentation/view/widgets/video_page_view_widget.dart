@@ -8,14 +8,18 @@ import 'package:statusly/core/styles/app_colors.dart';
 import 'package:statusly/core/styles/app_dimensions.dart';
 import 'package:statusly/core/utility/utils.dart';
 import 'package:statusly/features/whatsapp/presentation/controller/whatsapp_controller.dart';
+import 'package:statusly/features/whatsapp/presentation/view/widgets/empty_status_folder_widget.dart';
 
 class VideoPageViewWidget extends GetView<WhatsAppController> {
   const VideoPageViewWidget({super.key});
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
-      slivers: [ Obx((){
-          return SliverPadding(
+      slivers: [
+        Obx((){
+          return controller.images.isEmpty
+              ? EmptyStatusFolderWidget()
+               : SliverPadding(
             padding: EdgeInsets.all(AppDimensions.spacing_15),
             sliver: SliverGrid.builder(
                 itemCount: controller.videos.length,
